@@ -27,3 +27,20 @@ def test_session_isolation(db):
     history_a = db.recent(count=5, session_id="a")
     assert len(history_a) == 1
     assert history_a[0]["content"] == "session A msg"
+
+def test_user_facts_upsert_and_get(tmp_path):
+    from memory.user_facts import UserFacts
+    facts = UserFacts(db_path=tmp_path / "test.db")
+    facts.upsert("name", "Jakub")
+    facts.upsert("name", "Jakub Novak")  # update
+    all_facts = facts.get_all()
+    assert all_facts["name"] == "Jakub Novak"
+
+def test_user_facts_multiple_keys(tmp_path):
+    from memory.user_facts import UserFacts
+    facts = UserFacts(db_path=tmp_path / "test.db")
+    facts.upsert("city", "Prague")
+    facts.upsert("language", "Czech")
+    all_facts = facts.get_all()
+    assert all_facts["city"] == "Prague"
+    assert all_facts["language"] == "Czech"

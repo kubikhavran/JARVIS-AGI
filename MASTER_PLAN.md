@@ -8,10 +8,10 @@
 | M2 | ✅ DONE | STT pipeline: VAD, hotword, transcription |
 | M3 | ✅ DONE | LLM brain + intent router |
 | M4 | ✅ DONE | TTS: edge-tts, interruptible |
-| M5 | 🔲 NEXT | Core engine loop + SQLite memory |
-| M6 | 🔲 TODO | 11 skills |
-| M7 | 🔲 TODO | ChromaDB semantic memory + user facts |
-| M8 | 🔲 TODO | Polish + persistent service |
+| M5 | ✅ DONE | Core engine loop + SQLite memory |
+| M6 | ✅ DONE | 11 skills |
+| M7 | ✅ DONE | ChromaDB semantic memory + user facts |
+| M8 | 🔲 NEXT | Polish + persistent service |
 
 ## Architecture Quick Reference
 

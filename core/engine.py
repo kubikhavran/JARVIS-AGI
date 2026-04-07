@@ -9,6 +9,8 @@ from stt.transcriber import Transcriber
 from brain.router import IntentRouter
 from tts.speaker import Speaker
 from memory.chat_history import ChatHistory
+from memory.vector_store import VectorStore
+from memory.user_facts import UserFacts
 from skills.registry import SkillRegistry
 
 logger = get_logger(__name__)
@@ -35,6 +37,9 @@ class Engine:
             volume=config.tts.volume,
         )
         self._history = ChatHistory(db_path=config.memory.db_path)
+        self._vector_store = VectorStore(chroma_path=config.memory.chroma_path)
+        self._user_facts = UserFacts(db_path=config.memory.db_path)
+        self._exchange_count = 0
         self._registry = SkillRegistry()
         self._registry.auto_discover()
         self._router = IntentRouter(
@@ -90,6 +95,10 @@ class Engine:
             count=self._cfg.memory.context_history_count,
             session_id=self._session_id,
         )
+        # Augment with semantic memories if any exist
+        semantic = self._vector_store.search(text, top_k=3)
+        if semantic:
+            context = [{"role": "system", "content": "Relevant memories:\n" + "\n".join(semantic)}] + context
 
         try:
             skill_name, params = await self._router.route(text, context=context[:-1])
@@ -104,7 +113,34 @@ class Engine:
 
         logger.info(f"Jarvis: {response}")
         self._history.log("assistant", response, self._session_id)
+        # Store exchange in vector memory
+        self._exchange_count += 1
+        import uuid as _uuid
+        exchange_text = f"User: {text}\nAssistant: {response}"
+        self._vector_store.add(str(_uuid.uuid4()), exchange_text, {"session": self._session_id})
+        # Background user fact extraction every 5 exchanges
+        if self._exchange_count % 5 == 0:
+            asyncio.create_task(self._extract_user_facts(exchange_text))
         await self._speaker.speak(response)
+
+    async def _extract_user_facts(self, context_text: str) -> None:
+        from brain.ollama_client import OllamaClient
+        import json
+        client = OllamaClient(base_url=self._cfg.llm.ollama_url, model=self._cfg.llm.ollama_model)
+        prompt = (
+            "Extract any personal facts about the user from this conversation. "
+            "Return a JSON array of {\"key\": \"...\", \"value\": \"...\"} objects, or empty array [].\n"
+            f"Conversation:\n{context_text}"
+        )
+        try:
+            raw = await client.chat([{"role": "user", "content": prompt}], json_mode=True)
+            facts = json.loads(raw) if isinstance(raw, str) else raw
+            if isinstance(facts, list):
+                for f in facts:
+                    if "key" in f and "value" in f:
+                        self._user_facts.upsert(f["key"], f["value"])
+        except Exception as e:
+            logger.debug(f"User fact extraction failed (non-critical): {e}")
 
     def stop(self) -> None:
         self._running = False
