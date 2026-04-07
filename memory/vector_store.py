@@ -22,8 +22,10 @@ class VectorStore:
     def _load_model(self) -> None:
         if self._loaded:
             return
-        logger.info(f"Loading sentence-transformers: {self._model_name}")
-        self._model = SentenceTransformer(self._model_name, device="cuda")
+        import torch
+        device = "cuda" if torch.cuda.is_available() else "cpu"
+        logger.info(f"Loading sentence-transformers: {self._model_name} on {device}")
+        self._model = SentenceTransformer(self._model_name, device=device)
         self._loaded = True
 
     def add(self, doc_id: str, text: str, metadata: dict | None = None) -> None:

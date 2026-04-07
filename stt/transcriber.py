@@ -23,11 +23,26 @@ class Transcriber:
     def _load(self) -> None:
         if self._loaded:
             return
-        logger.info(f"Loading Whisper {self.model_size} on {self.device}...")
+        device = self.device
+        compute_type = self.compute_type
+        # Auto-fallback if CUDA requested but not available
+        if device == "cuda":
+            try:
+                import torch
+                if not torch.cuda.is_available():
+                    raise RuntimeError("CUDA not available")
+                # Test cublas is loadable
+                import ctypes
+                ctypes.CDLL("cublas64_12.dll")
+            except Exception as e:
+                logger.warning(f"CUDA unavailable ({e}), falling back to CPU int8")
+                device = "cpu"
+                compute_type = "int8"
+        logger.info(f"Loading Whisper {self.model_size} on {device}...")
         self._model = WhisperModel(
             self.model_size,
-            device=self.device,
-            compute_type=self.compute_type,
+            device=device,
+            compute_type=compute_type,
         )
         self._loaded = True
         logger.info("Whisper loaded")
