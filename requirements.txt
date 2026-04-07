@@ -31,6 +31,9 @@ yt-dlp>=2024.1
 pillow>=10.0
 pytesseract>=0.3.10
 
+# Tray
+pystray>=0.19
+
 # Dev
 pytest>=8.0
 pytest-asyncio>=0.23

@@ -30,3 +30,11 @@ Mic → VAD → Hotword → STT → Brain (Ollama/Gemini) → Skill → TTS
 - Config: `settings.yaml` + `.env`
 - Plan: `docs/superpowers/plans/2026-04-06-jarvis-agi.md`
 - Spec: `docs/superpowers/specs/2026-04-06-jarvis-agi-design.md`
+
+## Post-M8 Enhancements
+
+| Feature | Status |
+|---|---|
+| System tray icon (pystray) | ✅ DONE |
+| Windows autostart (Task Scheduler) | ✅ DONE |
+| Autostart voice skill | ✅ DONE |
