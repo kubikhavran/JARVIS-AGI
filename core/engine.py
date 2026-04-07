@@ -53,13 +53,16 @@ class Engine:
 
         self._wake_event = asyncio.Event()
         self._running = False
+        self._loop: asyncio.AbstractEventLoop | None = None
 
     def _on_wake(self) -> None:
-        loop = asyncio.get_event_loop()
-        self._speaker.interrupt(loop=loop)
-        loop.call_soon_threadsafe(self._wake_event.set)
+        if self._loop is None:
+            return
+        self._speaker.interrupt(loop=self._loop)
+        self._loop.call_soon_threadsafe(self._wake_event.set)
 
     async def run(self) -> None:
+        self._loop = asyncio.get_running_loop()
         print_banner()
         self._running = True
         self._audio.start()
