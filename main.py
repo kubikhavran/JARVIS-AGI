@@ -1,6 +1,24 @@
+import os
+import sys
+
+# Inject CUDA DLL paths before any CUDA-dependent imports
+def _inject_cuda_paths() -> None:
+    from dotenv import load_dotenv
+    load_dotenv()
+    cuda_dll = os.getenv("CUDA_DLL_PATH", "")
+    if cuda_dll and os.path.isdir(cuda_dll):
+        os.add_dll_directory(cuda_dll)
+    # Also add Ollama's bundled CUDA as fallback
+    ollama_cuda = os.path.expandvars(
+        r"%LOCALAPPDATA%\Programs\Ollama\lib\ollama\cuda_v12"
+    )
+    if os.path.isdir(ollama_cuda):
+        os.add_dll_directory(ollama_cuda)
+
+_inject_cuda_paths()
+
 import asyncio
 import signal
-import sys
 import threading
 import argparse
 from core.config import Config
