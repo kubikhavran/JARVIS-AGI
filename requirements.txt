@@ -13,7 +13,7 @@ numpy>=1.24
 
 # LLM
 httpx>=0.27
-google-generativeai>=0.7
+google-genai>=1.0
 
 # TTS
 edge-tts>=6.1

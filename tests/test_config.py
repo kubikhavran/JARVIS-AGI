@@ -6,7 +6,7 @@ def test_config_loads_settings():
     cfg = Config()
     assert cfg.wake_word == "jarvis"
     assert cfg.stt.model == "medium"
-    assert cfg.llm.ollama_model == "qwen3:8b"
+    assert cfg.llm.ollama_model == "llama3.1:8b"
     assert cfg.memory.context_history_count == 5
 
 def test_config_env_override(monkeypatch):

@@ -1,6 +1,6 @@
 from __future__ import annotations
 import sqlite3
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 class ChatHistory:
@@ -24,7 +24,7 @@ class ChatHistory:
     def log(self, role: str, content: str, session_id: str = "") -> None:
         self._conn.execute(
             "INSERT INTO chat_history (timestamp, role, content, session_id) VALUES (?, ?, ?, ?)",
-            (datetime.utcnow().isoformat(), role, content, session_id),
+            (datetime.now(timezone.utc).isoformat(), role, content, session_id),
         )
         self._conn.commit()
 

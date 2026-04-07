@@ -1,5 +1,5 @@
 import sqlite3
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from skills.base import BaseSkill
 
@@ -33,7 +33,7 @@ class NoteTakerSkill(BaseSkill):
         if action == "save":
             self._conn.execute(
                 "INSERT INTO notes (timestamp, content) VALUES (?, ?)",
-                (datetime.utcnow().isoformat(), content),
+                (datetime.now(timezone.utc).isoformat(), content),
             )
             self._conn.commit()
             return "Note saved."

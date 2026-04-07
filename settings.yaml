@@ -8,7 +8,7 @@ stt:
   compute_type: float16
 llm:
   primary: ollama
-  ollama_model: qwen3:8b
+  ollama_model: llama3.1:8b
   ollama_url: http://localhost:11434
   fallback: gemini
   timeout_sec: 30

@@ -1,6 +1,6 @@
 from __future__ import annotations
 import sqlite3
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 class UserFacts:
@@ -22,7 +22,7 @@ class UserFacts:
         existing = self._conn.execute(
             "SELECT id FROM user_facts WHERE key=?", (key,)
         ).fetchone()
-        now = datetime.utcnow().isoformat()
+        now = datetime.now(timezone.utc).isoformat()
         if existing:
             self._conn.execute(
                 "UPDATE user_facts SET value=?, confidence=?, updated_at=? WHERE key=?",
