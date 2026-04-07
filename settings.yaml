@@ -1,0 +1,27 @@
+wake_word: jarvis
+language:
+  primary: en
+  secondary: cs
+stt:
+  model: medium
+  device: cuda
+  compute_type: float16
+llm:
+  primary: ollama
+  ollama_model: qwen3:8b
+  ollama_url: http://localhost:11434
+  fallback: gemini
+  timeout_sec: 30
+tts:
+  voice_en: en-US-JennyNeural
+  voice_cs: cs-CZ-VlastaNeural
+  rate: +0%
+  volume: +0%
+memory:
+  db_path: ./data/jarvis.db
+  chroma_path: ./data/chroma
+  context_history_count: 5
+timeouts:
+  stt_max_recording_sec: 30
+  llm_response_sec: 30
+  skill_execute_sec: 60
