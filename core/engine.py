@@ -12,6 +12,7 @@ from memory.chat_history import ChatHistory
 from memory.vector_store import VectorStore
 from memory.user_facts import UserFacts
 from skills.registry import SkillRegistry
+from core.ui import print_banner, print_user, print_jarvis, print_status, print_error
 
 logger = get_logger(__name__)
 
@@ -59,6 +60,7 @@ class Engine:
         loop.call_soon_threadsafe(self._wake_event.set)
 
     async def run(self) -> None:
+        print_banner()
         self._running = True
         self._audio.start()
         self._hotword.on_detect(self._on_wake)
@@ -76,6 +78,7 @@ class Engine:
 
     async def _handle_command(self) -> None:
         logger.info("Listening for command...")
+        print_status("Listening...")
         await self._speaker.speak("Yes?")
 
         pcm = await self._audio.record_until_silence(
@@ -89,6 +92,7 @@ class Engine:
             return
 
         logger.info(f"User: {text}")
+        print_user(text)
         self._history.log("user", text, self._session_id)
 
         context = self._history.recent(
@@ -109,9 +113,11 @@ class Engine:
             )
         except Exception as e:
             logger.error(f"Skill execution failed: {e}")
+            print_error(str(e))
             response = "I couldn't do that, sorry."
 
         logger.info(f"Jarvis: {response}")
+        print_jarvis(response)
         self._history.log("assistant", response, self._session_id)
         # Store exchange in vector memory
         self._exchange_count += 1

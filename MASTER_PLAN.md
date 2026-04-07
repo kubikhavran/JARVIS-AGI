@@ -11,7 +11,7 @@
 | M5 | ✅ DONE | Core engine loop + SQLite memory |
 | M6 | ✅ DONE | 11 skills |
 | M7 | ✅ DONE | ChromaDB semantic memory + user facts |
-| M8 | 🔲 NEXT | Polish + persistent service |
+| M8 | ✅ DONE | Polish + persistent service |
 
 ## Architecture Quick Reference
 
@@ -20,6 +20,8 @@ Mic → VAD → Hotword → STT → Brain (Ollama/Gemini) → Skill → TTS
                                     ↕
                             Memory (SQLite + ChromaDB)
 ```
+
+## All milestones complete! 🎉
 
 ## Key Files
 - Entry point: `main.py`
